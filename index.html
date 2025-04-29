@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gender Reveal Scratch Card</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      text-align: center;
+      background-color: #f2f2f2;
+      font-family: sans-serif;
+    }
+    #container {
+      position: relative;
+      width: 300px;
+      height: 300px;
+      margin: 40px auto;
+      border: 2px solid #ccc;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    #resultImage {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+    h1 {
+      margin-top: 30px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Scratch to Reveal!</h1>
+  <div id="container">
+    <img id="resultImage" src="" alt="Hidden Result">
+    <canvas id="scratchCanvas" width="300" height="300"></canvas>
+  </div>
+
+  <script>
+    const genderOptions = [
+      { label: "Boy", image: "https://via.placeholder.com/300x300/87CEFA/000000?text=It's+a+Boy" },
+      { label: "Girl", image: "https://via.placeholder.com/300x300/FFB6C1/000000?text=It's+a+Girl" }
+    ];
+
+    const selectedGender = genderOptions[Math.floor(Math.random() * genderOptions.length)];
+    document.getElementById('resultImage').src = selectedGender.image;
+
+    const canvas = document.getElementById('scratchCanvas');
+    const ctx = canvas.getContext('2d');
+    let isDrawing = false;
+
+    ctx.fillStyle = '#999';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    function getPosition(e) {
+      let rect = canvas.getBoundingClientRect();
+      return {
+        x: (e.touches ? e.touches[0].clientX : e.clientX) - rect.left,
+        y: (e.touches ? e.touches[0].clientY : e.clientY) - rect.top
+      };
+    }
+
+    function scratch(e) {
+      e.preventDefault();
+      if (!isDrawing) return;
+
+      const pos = getPosition(e);
+      ctx.globalCompositeOperation = 'destination-out';
+      ctx.beginPath();
+      ctx.arc(pos.x, pos.y, 20, 0, 2 * Math.PI);
+      ctx.fill();
+    }
+
+    canvas.addEventListener('mousedown', () => isDrawing = true);
+    canvas.addEventListener('mouseup', () => isDrawing = false);
+    canvas.addEventListener('mousemove', scratch);
+
+    canvas.addEventListener('touchstart', () => isDrawing = true);
+    canvas.addEventListener('touchend', () => isDrawing = false);
+    canvas.addEventListener('touchmove', scratch);
+  </script>
+</body>
+</html>
